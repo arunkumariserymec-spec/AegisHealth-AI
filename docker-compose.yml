@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. Full-Stack Web & Backend Service (Node.js / Express / Vite)
+  web-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/ai_health
+      - ML_SERVICE_URL=http://ml-service:8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - mongo
+      - ml-service
+    restart: unless-stopped
+
+  # 2. Python AI/ML & NLP Microservice (FastAPI / scikit-learn / spaCy / NLTK)
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    restart: unless-stopped
+
+  # 3. Persistent MongoDB Database
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

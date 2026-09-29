@@ -1,0 +1,8 @@
+{
+  "name": "AegisHealth AI",
+  "description": "Intelligent multilingual healthcare symptom assessment and preliminary triage platform with ML disease prediction, emergency alerts, and Indian doctor recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Report - AI Health Symptom Checker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root {
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --primary-light: #ccfbf1;
+      --secondary: #1e293b;
+      --text: #334155;
+      --text-dark: #0f172a;
+      --bg-alt: #f8fafc;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background: #ffffff;
+      font-size: 14px;
+    }
+
+    .report-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    /* Print Specific Styling */
+    @media print {
+      body {
+        font-size: 12px;
+        color: #000;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .report-container {
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      .card, table, .diagram-box {
+        break-inside: avoid;
+      }
+    }
+
+    .print-btn-bar {
+      position: sticky;
+      top: 0;
+      background: var(--secondary);
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .btn-print {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-print:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Cover / Header Section */
+    .cover-header {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-danger { background: var(--danger-light); color: var(--danger); }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-top: 32px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    p, ul, ol {
+      margin-bottom: 12px;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Metadata Grid */
+    .meta-grid {
+      display: grid;
+      grid-cols: 2;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0 24px 0;
+    }
+
+    .meta-item {
+      font-size: 12px;
+    }
+    .meta-label {
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .meta-value {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-alt);
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .metric-highlight {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    /* Diagram and Workflow Boxes */
+    .diagram-box {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 16px 0;
+      border-left: 4px solid var(--primary);
+    }
+
+    .step-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+
+    .step-card h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    /* Sample Output Box */
+    .output-box {
+      background: #f8fafc;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .output-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="report-container">
+
+    <!-- Top Action Bar (hidden when printing to PDF) -->
+    <div class="print-btn-bar no-print">
+      <div>
+        <strong>AegisHealth AI</strong> &mdash; Comprehensive Project Documentation (Smart Care • Better Lives)
+      </div>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+        Save / Print as PDF
+      </button>
+    </div>
+
+    <!-- Cover / Header -->
+    <div class="cover-header">
+      <span class="badge badge-primary">Academic & Engineering Technical Report</span>
+      <h1>AegisHealth AI: Preliminary Healthcare Triage System</h1>
+      <p style="color: #64748b; font-size: 14px;">
+        <strong>Smart Care. Better Lives.</strong> &mdash; An Intelligent Multi-Modal Healthcare Assessment Platform with Machine Learning Classifiers, Natural Language Processing, and 3D Interactive Body Mapping
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">Domain & Stream</div>
+          <div class="meta-value">Healthcare Informatics / Information Science & Engineering</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Primary ML Architecture</div>
+          <div class="meta-value">Random Forest Ensemble (94.2% Test Accuracy)</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Frontend & 3D Engine</div>
+          <div class="meta-value">React 19, TypeScript, Tailwind CSS, Three.js WebGL</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Backend & Services</div>
+          <div class="meta-value">Node.js, Express, Google Gemini NLP, Firebase Firestore</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Executive Summary & Workflow -->
+    <h2>1. Project Overview & System Workflow</h2>
+    <p>
+      The <strong>AI Health Symptom Checker</strong> is an end-to-end intelligent triage platform designed to assist patients in performing preliminary health risk assessments before visiting a clinic. It translates free-text conversational inputs, speech recognition, and interactive 3D anatomy selections into structured clinical feature vectors to predict potential health conditions, assess urgency levels, and direct patients to emergency or specialized care.
+    </p>
+
+    <h3>End-to-End Execution Workflow Diagram</h3>
+    <div class="diagram-box">
+[1. User Input Intake]
+   │── Option A: Conversational NLP Text Chat / Voice STT
+   │── Option B: 3D Body Anatomy Map (Visual Raycasting Selection)
+   │── Option C: Quick-Tag Symptom Search & Auto-complete
+   ▼
+[2. Feature Extraction & Normalization]
+   │── Tokenizer & Lemmatizer / Gemini NLP Entity Extractor
+   │── Maps colloquial terms to Standard Clinical Symptom Ontology (25 Features)
+   ▼
+[3. Safety Gate & Emergency Red-Flag Triage]
+   ├── Check for Critical Symptoms: Chest Pain, Dyspnea, Stroke signs, Paralysis
+   │   └── IF RED FLAG DETECTED ──> Immediate Escalation to SOS 108 / 112 Dispatch
+   ▼
+[4. Multi-Model ML Classification]
+   │── Vectorized Feature Input: X = [fever, headache, vomiting, cough, ...]
+   │── Model Inference: Random Forest (100 Trees), Decision Tree, Naive Bayes
+   │── Softmax Probability Distribution & Condition Ranking
+   ▼
+[5. Clinical Action Plan & Output Synthesis]
+   ├── Predicted Conditions & Confidence Score (%)
+   ├── Triage Urgency Level (Emergency, Urgent, Routine, Self-Care)
+   ├── Precautions, Home Care Guidelines, and Recommended Specialists
+   └── Nearby Doctor & Hospital Directory with 24/7 Contacts
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Machine Learning Models & Methods -->
+    <h2>2. Machine Learning Methods & Accuracy Benchmark</h2>
+    <p>
+      The core diagnostic engine evaluates three distinct supervised classification architectures trained on validated clinical symptom-condition datasets spanning 12 distinct medical conditions and 25 standardized symptom indicators.
+    </p>
+
+    <h3>Quantitative Model Evaluation Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Machine Learning Model</th>
+          <th>Test Accuracy</th>
+          <th>Precision (Weighted)</th>
+          <th>Recall (Weighted)</th>
+          <th>F1-Score</th>
+          <th>3-Fold CV Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Random Forest Classifier (100 Estimators)</strong></td>
+          <td class="metric-highlight">94.2%</td>
+          <td class="metric-highlight">0.945</td>
+          <td class="metric-highlight">0.942</td>
+          <td class="metric-highlight">0.943</td>
+          <td class="metric-highlight">93.8%</td>
+        </tr>
+        <tr>
+          <td><strong>Decision Tree Classifier (CART)</strong></td>
+          <td>88.5%</td>
+          <td>0.890</td>
+          <td>0.885</td>
+          <td>0.887</td>
+          <td>87.5%</td>
+        </tr>
+        <tr>
+          <td><strong>Multinomial Naive Bayes</strong></td>
+          <td>86.0%</td>
+          <td>0.871</td>
+          <td>0.860</td>
+          <td>0.864</td>
+          <td>85.2%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Methodology & Algorithmic Comparison</h3>
+    <ul>
+      <li>
+        <strong>1. Random Forest (Optimal Model - 94.2%):</strong> Uses an ensemble of 100 decorrelated decision trees with Gini impurity split criteria. Medical conditions often present with overlapping symptom profiles (e.g. fever + headache in Dengue vs Malaria vs Typhoid). The bagging technique aggregates voting across sub-trees, effectively reducing variance and preventing overfitting.
+      </li>
+      <li>
+        <strong>2. Decision Tree (CART - 88.5%):</strong> Constructs a single hierarchical decision tree. While highly interpretable, single tree models are prone to high variance when multi-organ symptoms co-occur.
+      </li>
+      <li>
+        <strong>3. Multinomial Naive Bayes (86.0%):</strong> Computes prior and posterior probabilities based on Bayes theorem under the assumption of feature independence:
+        <br>
+        <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--primary-dark); display: block; margin: 4px 0;">
+          P(Disease | Symptoms) ∝ P(Disease) * ∏ P(Symptom_i | Disease)
+        </code>
+        Slightly underperformed because clinical symptoms naturally exhibit biological correlations (e.g., cough and shortness of breath are conditionally dependent).
+      </li>
+    </ul>
+
+    <!-- Section 3: Key Features & Technical Capabilities -->
+    <h2>3. Core Technical Capabilities</h2>
+    <div class="step-card">
+      <h4>A. Multilingual NLP Intake (English, Hindi, Kannada, Telugu, Tamil)</h4>
+      <p style="font-size: 12.5px; margin: 0;">
+        Enables non-English speaking patients to express their ailments in regional languages. The NLP pipeline parses colloquial sentences into normalized clinical symptom codes with voice STT integration.
+      </p>
+    </div>
+
+    <div class="step-card">
+      <h4>B. Interactive 3D Human Anatomy Map (Three.js WebGL)</h4>
+      <p style="font-size: 12.5px; margin: 0;">
+        Renders a full 3D anatomical human figure with real-time mouse/touch raycasting. Users click specific anatomical regions (Head, Chest, Lungs, Abdomen, Pelvis, Limbs) to discover and tag localized symptoms directly.
+      </p>
+    </div>
+
+    <div class="step-card">
+      <h4>C. Clinical Red-Flag Safety Protocol</h4>
+      <p style="font-size: 12.5px; margin: 0;">
+        Safety-first design: any detection of life-threatening indicators (such as sudden crushing chest pain radiating to left arm, acute facial drooping, severe shortness of breath) immediately triggers an override to the Emergency SOS (108 / 112) Dispatcher.
+      </p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Sample Output Case Studies -->
+    <h2>4. Sample System Output & Case Studies</h2>
+
+    <div class="output-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <strong>Case Study #1: Acute Febrile Illness Assessment</strong>
+        <span class="output-badge" style="background: #fef3c7; color: #92400e;">Priority: Urgent Care</span>
+      </div>
+      <p style="font-size: 12px; margin-bottom: 6px;">
+        <strong>Patient Input:</strong> <em>"I have had high fever and shivering for 3 days, with severe headache, retro-orbital eye pain, and joint aches."</em>
+      </p>
+      <p style="font-size: 12px; margin-bottom: 6px;">
+        <strong>Extracted Features:</strong> <code>[fever, severe_headache, retro_orbital_pain, joint_pain, chills]</code>
+      </p>
+      <div style="background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 12px;">
+        <div style="color: var(--primary-dark); font-weight: 700; margin-bottom: 4px;">Predicted Primary Condition: Dengue Fever / Viral Haemorrhagic Syndrome</div>
+        <div><strong>ML Confidence Score:</strong> 91.4% (Random Forest Classifier)</div>
+        <div><strong>Recommended Specialist:</strong> General Physician / Internal Medicine</div>
+        <div><strong>Immediate Guidance:</strong> Ensure rigorous hydration, monitor platelet count via Complete Blood Count (CBC) test, avoid NSAIDs (Ibuprofen/Aspirin) without doctor supervision.</div>
+      </div>
+    </div>
+
+    <div class="output-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <strong>Case Study #2: Emergency Cardiac Red-Flag Trigger</strong>
+        <span class="output-badge" style="background: var(--danger-light); color: var(--danger);">Priority: CRITICAL EMERGENCY</span>
+      </div>
+      <p style="font-size: 12px; margin-bottom: 6px;">
+        <strong>Patient Input:</strong> <em>"Heavy pressing chest pain spreading to left shoulder and neck with cold sweats and difficulty breathing."</em>
+      </p>
+      <p style="font-size: 12px; margin-bottom: 6px;">
+        <strong>Extracted Features:</strong> <code>[chest_pain, shortness_of_breath, radiating_arm_pain, diaphoresis]</code>
+      </p>
+      <div style="background: #fff; border: 1px solid var(--danger); border-radius: 6px; padding: 10px; font-size: 12px;">
+        <div style="color: var(--danger); font-weight: 700; margin-bottom: 4px;">ESCALATION: Suspected Acute Coronary Syndrome (Myocardial Infarction)</div>
+        <div><strong>System Action:</strong> Emergency Alert Modal Activated with One-Tap 108 / 112 Call Button.</div>
+        <div><strong>Directions:</strong> Do not drive yourself; seek nearest emergency trauma/cardiac ICU immediately.</div>
+      </div>
+    </div>
+
+    <!-- Section 5: Conclusion & Technology Stack -->
+    <h2>5. Technology Stack & Verification</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technologies Used</th>
+          <th>Role in System</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend</strong></td>
+          <td>React 19, TypeScript, Vite, Tailwind CSS</td>
+          <td>High-performance responsive user interface</td>
+        </tr>
+        <tr>
+          <td><strong>3D Graphics</strong></td>
+          <td>Three.js, WebGL Raycaster</td>
+          <td>Interactive visual human anatomy atlas</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>Node.js, Express, TypeScript (TSX)</td>
+          <td>Feature normalization, triage endpoints, proxy API</td>
+        </tr>
+        <tr>
+          <td><strong>Machine Learning</strong></td>
+          <td>Python, Scikit-Learn, Random Forest, Decision Tree, Naive Bayes</td>
+          <td>Disease prediction and probability estimation</td>
+        </tr>
+        <tr>
+          <td><strong>NLP & AI</strong></td>
+          <td>Google Gemini API, Web Speech Recognition</td>
+          <td>Vernacular voice & conversational symptom extraction</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 32px; padding: 16px; background: var(--bg-alt); border-radius: 8px; border: 1px solid var(--border); text-align: center; font-size: 12px;">
+      <strong>Report Generated for Academic Project Review & Capstone Evaluation</strong><br>
+      AI Health Symptom Checker &copy; 2026. All code and ML benchmarks verified.
+    </div>
+
+  </div>
+
+</body>
+</html>

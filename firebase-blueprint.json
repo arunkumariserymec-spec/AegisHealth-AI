@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "Represents an authenticated application user profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["patient", "admin", "guest"] },
+        "age": { "type": "number" },
+        "sex": { "type": "string", "enum": ["female", "male", "other"] },
+        "preferredLanguage": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email", "name", "role"]
+    },
+    "consultationRecord": {
+      "title": "ConsultationRecord",
+      "description": "Represents a completed healthcare symptom assessment and ML triage result",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientSex": { "type": "string" },
+        "symptoms": { "type": "string" },
+        "triageLevel": { "type": "string", "enum": ["emergency", "urgent", "moderate", "self_care"] },
+        "primaryCondition": { "type": "string" },
+        "primaryProbability": { "type": "number" },
+        "possibleConditions": { "type": "string" },
+        "emergencyDetected": { "type": "string" },
+        "notes": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "userId", "triageLevel", "primaryCondition"]
+    },
+    "symptomEntry": {
+      "title": "SymptomEntry",
+      "description": "Standard clinical symptom metadata mapped to ML classifiers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "aliases": { "type": "string" },
+        "isEmergencyIndicator": { "type": "string" },
+        "commonDiseases": { "type": "string" }
+      },
+      "required": ["id", "name", "category"]
+    },
+    "feedbackEntry": {
+      "title": "FeedbackEntry",
+      "description": "Patient and clinical user feedback records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string", "format": "email" },
+        "consultationId": { "type": "string" },
+        "rating": { "type": "number" },
+        "category": { "type": "string", "enum": ["accuracy", "anatomy_3d", "voice_input", "ui_experience", "doctor_referral", "other"] },
+        "comment": { "type": "string" },
+        "tags": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "rating", "category", "comment"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "Authenticated user personal profile record"
+    },
+    "/consultations/{consultationId}": {
+      "schema": "consultationRecord",
+      "description": "Clinical symptom assessment and machine learning triage history records"
+    },
+    "/symptoms/{symptomId}": {
+      "schema": "symptomEntry",
+      "description": "Clinical symptom lexicon definitions"
+    },
+    "/feedback/{feedbackId}": {
+      "schema": "feedbackEntry",
+      "description": "Patient and clinical user feedback entries"
+    }
+  }
+}

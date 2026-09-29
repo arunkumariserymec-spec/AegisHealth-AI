@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Connection test rule
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // User profile: Users can read and write only their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Consultations: Authenticated users can access their own, guests can create
+    match /consultations/{consultationId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || request.auth.token.role == 'admin');
+    }
+
+    // Symptoms lexicon: Anyone can read symptoms definitions
+    match /symptoms/{symptomId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // User feedback: Anyone can submit feedback; read allowed for review
+    match /feedback/{feedbackId} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || request.auth.token.role == 'admin');
+    }
+  }
+}

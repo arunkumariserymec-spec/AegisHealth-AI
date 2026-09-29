@@ -1,0 +1,29 @@
+{
+  "name": "ai-health-symptom-checker-desktop",
+  "version": "1.0.0",
+  "description": "Cross-platform desktop application for AI Health Symptom Checker",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "tsc && electron-builder"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.4.0"
+  },
+  "build": {
+    "appId": "com.aihealth.symptomchecker",
+    "productName": "AI Health Symptom Checker",
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "mac": {
+      "target": ["dmg", "zip"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
